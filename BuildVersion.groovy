@@ -68,12 +68,17 @@ def mulpart(){
     dir("${software}/mulpart") {
         sh "wget -q -O flash_driver.s19 ${projectTemplate}/${repo_dir}-flash_driver.s19 && wget -q ${projectTemplate}/mulpart.conf"
         sh "mv ${vp_bin}/eagle.s19 ."//复制s19文件
+        sh "sha1sum eagle.s19 |cut -d ' ' -f 1|xargs -i sed -i s/^VP_CHKSUM=.*/VP_CHKSUM={}/ mulpart.conf"//修改配置 sha1
         try {
-            sh "sed -i s/^VP_FILENUM=.*/VP_FILENUM=${VP_FILENUM}/ mulpart.conf"
+            strs=mulpart_conf.split(';')
+            strs.each{i->
+                ii=i.split('=')
+                sh "ret=`sed -n /^${ii[0]}=.*/p mulpart.conf` && if [ -z \$ret} ];then echo ${i} >> mulpart.conf; else sed -i s/^${ii[0]}=.*/${i}/ mulpart.conf; fi"
+            }
         } catch (err) {
-            echo "${err},[VP_FILENUM use default from mulpart.conf]"
+            echo "${err},[some params use default from mulpart.conf]"
         }
-        sh "sha1sum eagle.s19 |cut -d ' ' -f 1|xargs -i sed -i s/^VP_CHKSUM=.*/VP_CHKSUM={}/ mulpart.conf && cat mulpart.conf"//修改配置 sha1
+        sh "cat mulpart.conf"
         sh "tar -cvf mulpart.tar *"
         sh "mv -f mulpart.tar ../"
     }
@@ -84,7 +89,13 @@ def mulpart(){
 
     sh "/bin/cp -f ${software}/mulpart.tar ${template_file}/mdm9607-data1/.default"//复制mulpart文件到工具目录
 
-    sh "cd ${template_file}/mdm9607-data1/conf && echo -e \"${m2m_version}\"> m2m_version && cat m2m_version && wget -O project_info ${projectTemplate}/${repo_dir}-project_info && cat project_info"//生成配置文件
+    sh "cd ${template_file}/mdm9607-data1/conf && echo -e \"${m2m_version}\"> m2m_version && cat m2m_version"
+    
+    try{
+        sh "cd ${template_file}/mdm9607-data1/conf && wget -O project_info ${projectTemplate}/${repo_dir}-project_info && cat project_info"//生成配置文件
+    }catch(err){
+        echo "${err},[请确认此项目不存在project_info文件]"
+    }
 
     sh "/bin/cp -r ${ap_bin}/* ${template_file}/mdm9607-app/appfs_a/bin/"//复制ap bin下文件
 

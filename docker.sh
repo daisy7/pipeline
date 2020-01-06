@@ -8,6 +8,12 @@ params=" --restart always \
 --add-host file.m2motive.com:$host_ip \
 --add-host gitlab.m2motive.com:$host_ip"
 
+#gitbook
+docker run -p 4000:4000 --name gitbook \
+    $params \
+    -v /home/daisy/httpd/www/gitbook/gitbook:/srv/gitbook \
+    -v /home/daisy/httpd/www/gitbook/html:/srv/html \
+    fellah/gitbook
 #jenkins-slave
 docker run -d -p 2222:22 --name jenkins-slave \
     $params \
@@ -117,10 +123,10 @@ docker run -d --name samba \
     -u "weitao;weitao;1013;dqa_hw" \
     -u "zhaozhanhua;zhaozhanhua;1014;dqa_hw" \
     -s "hardware;/mount/public;yes;no;yes;all;%S;%S" \
-    -s "hw1;/mount/hw1;yes;no;no;@hw1;fanbo,chenning;@hw1" \
-    -s "hw2;/mount/hw2;yes;no;no;@hw2;fanbo;@hw2" \
-    -s "hw3;/mount/hw3;yes;no;no;@hw3;fanbo;@hw3" \
-    -s "dqa_hw;/mount/dqa_hw;yes;no;no;@dqa_hw;fanbo;@dqa_hw"
+    -s "hw1;/mount/hw1;yes;no;yes;all;fanbo,chenning;@hw1" \
+    -s "hw2;/mount/hw2;yes;no;yes;all;fanbo;@hw2" \
+    -s "hw3;/mount/hw3;yes;no;yes;all;fanbo;@hw3" \
+    -s "dqa_hw;/mount/dqa_hw;yes;no;yes;all;fanbo;@dqa_hw"
 
     <name> is how it's called for clients
     <path> path to share

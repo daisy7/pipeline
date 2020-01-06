@@ -1,6 +1,6 @@
 pipeline{
     agent{
-        label "192.168.1.76"
+        label "192.168.1.19"
     }
     options {
         buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '20', numToKeepStr: '50')
